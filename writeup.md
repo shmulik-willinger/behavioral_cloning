@@ -18,15 +18,19 @@ The goals / steps of this project are the following:
 ---
 ## Collecting the Training Set
 
-To capture good driving behavior, I first recorded a couple of laps on track one using center lane driving. Each recording epoch consist of 3 images represent 3 cameras on the vehicle. Here is an example image of center lane driving, from the look of the three cameras:
+To capture good driving behavior, I first recorded a couple of laps on track one using center lane driving. Each recording epoch consist of 3 images represent 3 cameras on the vehicle. Having 3 images for each epoch halpping collecting more data, and will help teach the network how to steer back to the center and correct wrong behaviors.
+
+Here is an example of how center lane driving looks from all the three cameras:
 
 Left camera              |  Center camera | Right camera
 :---------------------:|:---------------------:|:---------------------:
 ![]( https://github.com/shmulik-willinger/behavioral_cloning/blob/master/readme_img/left_2017_08_13_15_56_31_426.jpg?raw=true)  |  ![]( https://github.com/shmulik-willinger/behavioral_cloning/blob/master/readme_img/center_2017_08_13_15_56_31_426.jpg?raw=true) |  ![]( https://github.com/shmulik-willinger/behavioral_cloning/blob/master/readme_img/right_2017_08_13_15_56_31_426.jpg?raw=true)
 
-To aim for 'center of the road' driving, I recorded the vehicle recovering from the left side and right sides of the road back to center so that the vehicle would learn to correct wrong behaviors.
+In order to use the left and right images I needed to add a correction factor for the center-steering measurment, in order to  create adjusted steering measurements for the side camera images
 
 Some of the interesting challenges on the tracks including driving in the sharp curves, different texture and different borders of the road, and the second Track is also different from the first one. In order to train the car to drive on all of them I repeated the collection process on all the tracks and laps. Driving in the simulator is pretty difficult in some curves.
+
+I collected data of center lane driving from 5 laps, and some extra data for 'recovery driving from the sides', with special data recording driving smoothly  around 10 sharp curves.
 
 After the collection process, I had X number of data points images to start with.
 
@@ -38,9 +42,10 @@ ___________________
 
 ## Pre-process the Data Set
 
+Data augmentation has a couple of benefits, including adding more data for training the that the data is more comperhensive.
 I needed lots of data in order to well train the model. After collecting all the data from the two tracks, driving back and forth, and using all the 3 cameras images, I also performed the following steps:
 
-The top portion of the image capture sky, trees ans other elements which are unnessery for the training process and might distract the model, the same for the buttom portion of the image. So I croped The images to remove this parts. Each image reduced volume by 50%, and I gained a more accurate model, along with savings space, memory and runtime.
+The top portion of the image capture sky, trees ans other elements which are unnecessary for the training process and might distract the model, the same for the buttom portion of the image. So I decided to remove pixels contain redundant information. I cropped The images to remove this pixels. Each image reduced volume by 50%, and I gained a more accurate model, along with savings space, memory and model runtime.
 Here is an example of the cropping process on an image:
 
 original image      |  Cropping process | Cropped image
@@ -49,7 +54,7 @@ original image      |  Cropping process | Cropped image
 
 Since each recording epoch has 3 images represent 3 cameras on the vehicle, I used all this images to increase the dataset and generalize the model.
 
-To help the model generalize and the accuracy on the opposite curves, I flipped the images and angles to simulate driving counter-clockwise, thinking that this would save me to collect more reliable information and will double the dataset. There are couple of ways to flip an image, I used cv2.flip() after reading that it usually faster that using ather methods like np.fliplr().  here is an image that has been flipped:
+To help the model generalize better and to improve the accuracy on the opposite curves, I flipped the images and angles to simulate driving counter-clockwise, thinking that this would save me to collect more reliable information and will double the dataset. There are couple of ways to flip an image, I used cv2.flip() after reading that it usually faster that using ather methods like np.fliplr().  here is an image that has been flipped:
 
 original image      |  flipped image
 :---------------------:|:---------------------:
@@ -79,12 +84,6 @@ Ideally, the model will make good predictions on both the training and validatio
 
 **Approach taken for finding the solution**
 
-My model consists of a convolution neural network with 3 Convolution layers with 5x5 filter sizes and depths between 24 and 48, along with 3 MaxPool layers followed by Dropout layers.
-
-The model includes RELU layers to introduce nonlinearity, and the data is normalized in the model using a Keras lambda layer.
-
-At the end of the model I have 4 Dense layers and a single output node that will predict the steering angle, which makes this a regression network.
-
 Because this model is a regression network (and not classification) and I what it to minimize the error between the steering measurment that the network predict and the truth steering, so I used 'mean suared error' for the loss function (instead the cross-antropy) since it's a good function for it.
 
 I randomly shuffled the data and split off 20% for a validation set.
@@ -99,9 +98,12 @@ Both normalizations were done by adding a lambda layer to the model, which is co
 
 ** Parameters tuning **
 
+To add the left and right images for each epoch I needed to configure the 'correction factor' parameter to set their steering value. I started with the default 0.2 and made some  experimentation to changes it till I noticed an improvment in the driving simulator.
+
 The model used an adam optimizer, so the learning rate was not tuned manually.
 
 Keras is using 10 epochs as default. After observing that the validation loss decreases for the first 3 epoches and then increasing again, I changed the epochs parameter to 3 to prevent overfitting.
+
 
 
 ** Reduce overfitting in the model **
@@ -112,6 +114,17 @@ In order to gauge how well the model was working, I split my image and steering 
 
 To combat the overfitting, I modified the model and added Dropout layers and more dataset. The model was also trained and validated on different data sets to ensure that the model was not overfitting.
 
+**Using Generator**
+
+The images captured in the car simulator are very large comparing to dataset images for other common networks. Each image contains 76,800 pixels (80X320X3) after cropping, and when the dataset contains 70K images we need a huge memory for network training. I used Generator to pull pieces of the data and process it on the fly only when the model need it.  
+
+The cons of using the generator is that errors are being hidden inside the thread, and if the inside code is failing for any exception such as loading the images, cropping ect., the file output will be 'StopIteration' with no more information.
+
+**Comments**
+
+When running the simulator to drive autonomously, it's running the model.prediction() function that gets the current image from the center camera. In order to get the right prediction it's necessary to process the image the same steps as we ran on the training set, including cropping and color changing. Missing this step will lead to strage predictions in the simulator.
+
+Machine learning involves trying out ideas and testing them to see if they work. If the model is over or underfitting, then try to figure out why and adjust accordingly. I tried a couple of ideas like reduced the bandwidth of the image by converting each image from BGR to YUV, adding brightness randomization by convering images to HSV, adding more layers (Fully connected, Polling, Conv2D and more) and checked the prediction changes in the simulator.
 
 ## Model Architecture
 
@@ -138,6 +151,12 @@ My model consisted of the following layers:
 | Fully connected	Output layer	| Linear combination WX+b|84| 43 |
 -->
 ![]( https://github.com/shmulik-willinger/traffic_sign_classifier/blob/master/readme_img/model.jpg?raw=true)
+
+The netwotk consists of a convolution neural network staring with normalization layer, followed by 5 convolution layer with 5x5 filter sizes and depths between 24 and 48, along with 3 MaxPool layers followed by Dropout layers.
+
+The model includes RELU layers to introduce nonlinearity, and the data is normalized in the model using a Keras lambda layer.
+
+At the end of the model I have 4 Fully connected layers and a single output node that will predict the steering angle (regression network)
 
 
 Here is a visualization of the architecture:
