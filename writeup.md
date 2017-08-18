@@ -54,19 +54,17 @@ original image      |  Cropping process | Cropped image
 
 Since each recording epoch has 3 images represent 3 cameras on the vehicle, I used all this images to increase the dataset and generalize the model.
 
-To help the model generalize better and to improve the accuracy on the opposite curves, I flipped the images and angles to simulate driving counter-clockwise, thinking that this would save me to collect more reliable information and will double the dataset. There are couple of ways to flip an image, I used cv2.flip() after reading that it usually faster that using ather methods like np.fliplr().  here is an image that has been flipped:
+To help the model generalize better and to improve the accuracy on the opposite curves, I flipped the images and angles to simulate driving counter-clockwise, thinking that this would save me to collect more reliable information and will double the dataset. There are couple of ways to flip an image, I used cv2.flip() after reading that it usually faster that using ather methods like np.fliplr().  Here is an image that has been flipped:
 
 original image      |  flipped image
 :---------------------:|:---------------------:
 ![]( https://github.com/shmulik-willinger/behavioral_cloning/blob/master/readme_img/before_flip.jpg?raw=true)  |  ![]( https://github.com/shmulik-willinger/behavioral_cloning/blob/master/readme_img/after_flip.jpg?raw=true)
 
-Using Keras Generator
+During the training I experienced some other image processing techniques like reduced the bandwidth of the image by converting each image from BGR to YUV, adding brightness randomization by convering images to HSV and more. After I realized that these changes were not conducive to better prediction outcomes - I removed them from the final preprocessing step. Here is an example of image Transformation I tried:
 
-Using Data Distribution Flattening
-
-Using Normalization and mean zero
-
-I finally randomly shuffled the data set and put 20% of the data into a validation set.
+reduce bandwith      |  brightness randomization | grayscale
+:---------------------:|:---------------------:|:---------------------:
+![]( https://github.com/shmulik-willinger/behavioral_cloning/blob/master/readme_img/reduce_bandwith.jpg?raw=true)  |  ![]( https://github.com/shmulik-willinger/behavioral_cloning/blob/master/readme_img/brightness_randomization.jpg?raw=true)|  ![]( https://github.com/shmulik-willinger/behavioral_cloning/blob/master/readme_img/grayscale.jpg?raw=true)
 
 ___________________
 
@@ -78,8 +76,11 @@ I used the images as the feature set, and the steering measurments as the lables
 
 The overall strategy for deriving a model architecture was to start with a known self-driving car model.
 
-My first step was to use a convolution neural network model similar to the nVidia architecture. I thought this model might be appropriate because it was built and designed as a self-driving car model.
-
+My first step was to use a convolution neural network model similar to the nVidia architecture. I thought this model might be appropriate because it was built and designed as a self-driving car model. The original model architecture:
+ ![]( https://github.com/shmulik-willinger/behavioral_cloning/blob/master/readme_img/nvidia.jpg?raw=true)
+'''
+https://devblogs.nvidia.com/parallelforall/deep-learning-self-driving-cars/
+'''
 Ideally, the model will make good predictions on both the training and validation sets. The implication is that when the network sees an image, it can successfully predict what angle was being driven at that moment.
 
 **Approach taken for finding the solution**
@@ -95,6 +96,11 @@ I noticed that the training loss and validation loss are both high, so I perform
 * subtracted 0.5 from each element, to mean centering the data.
 
 Both normalizations were done by adding a lambda layer to the model, which is convenient way to parallelize the process
+
+Here we can see the training and validation 'mean squared error loss' during the training:
+
+![]( https://github.com/shmulik-willinger/behavioral_cloning/blob/master/readme_img/mse_loss.png?raw=true)
+
 
 ** Parameters tuning **
 
@@ -118,9 +124,9 @@ To combat the overfitting, I modified the model and added Dropout layers and mor
 
 The images captured in the car simulator are very large comparing to dataset images for other common networks. Each image contains 76,800 pixels (80X320X3) after cropping, and when the dataset contains 70K images we need a huge memory for network training. I used Generator to pull pieces of the data and process it on the fly only when the model need it.  
 
-The cons of using the generator is that errors are being hidden inside the thread, and if the inside code is failing for any exception such as loading the images, cropping ect., the file output will be 'StopIteration' with no more information.
+The disadvantage of using the generator is that errors are being hidden inside the thread, and if the inside code (generator function) is failing for any exception such as loading the images, cropping ect., the file output will be 'StopIteration' with no more information.
 
-**Comments**
+**Remarks**
 
 When running the simulator to drive autonomously, it's running the model.prediction() function that gets the current image from the center camera. In order to get the right prediction it's necessary to process the image the same steps as we ran on the training set, including cropping and color changing. Missing this step will lead to strage predictions in the simulator.
 
@@ -129,7 +135,7 @@ Machine learning involves trying out ideas and testing them to see if they work.
 ## Model Architecture
 
 
-####2. Final Model Architecture
+**Final Model Architecture**
 
 My model consisted of the following layers:
 
@@ -168,4 +174,4 @@ I was satisfied that the model is making good predictions on the training and va
 
 I used the file video.py to record the video of the car while driving autonomously in the simulator, and the video files can be found here as well.
 
-Behavior Cloning is fun :)
+Behavior Cloning is fun
