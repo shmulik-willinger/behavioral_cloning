@@ -52,9 +52,11 @@ original image      |  Cropping process | Cropped image
 :---------------------:|:---------------------:|:---------------------:
 ![]( https://github.com/shmulik-willinger/behavioral_cloning/blob/master/readme_img/original.jpg?raw=true)  |  ![]( https://github.com/shmulik-willinger/behavioral_cloning/blob/master/readme_img/cropped.jpg?raw=true) |  ![]( https://github.com/shmulik-willinger/behavioral_cloning/blob/master/readme_img/processed.jpg?raw=true)
 
-Since each recording epoch has 3 images represent 3 cameras on the vehicle, I used all this images to increase the dataset and generalize the model.
+Since each recording epoch has 3 images represent 3 cameras on the vehicle, I used all this images to increase the dataset and generalize the model. It's important to add a correction-angle  for the steering measurement for the left and right cameras, since the steering provided from the simulator represent the center camera only.
 
-To help the model generalize better and to improve the accuracy on the opposite curves, I flipped the images and angles to simulate driving counter-clockwise, thinking that this would save me to collect more reliable information and will double the dataset. There are couple of ways to flip an image, I used cv2.flip() after reading that it usually faster that using ather methods like np.fliplr().  Here is an image that has been flipped:
+ ![]( https://github.com/shmulik-willinger/behavioral_cloning/blob/master/readme_img/correction-angle.png?raw=true)
+
+To help the model generalize better and to improve the accuracy on the opposite curves, I flipped the images and angles to simulate driving counter-clockwise, thinking that this would save me to collect more reliable information and will double the dataset. There are couple of ways to horizontally flip an image, I used cv2.flip() after reading that it usually faster that using ather methods like np.fliplr().  Here is an image that has been flipped:
 
 original image      |  flipped image
 :---------------------:|:---------------------:
@@ -65,6 +67,10 @@ During the training I experienced some other image processing techniques like re
 reduce bandwith      |  brightness randomization | grayscale
 :---------------------:|:---------------------:|:---------------------:
 ![]( https://github.com/shmulik-willinger/behavioral_cloning/blob/master/readme_img/reduce_bandwith.jpg?raw=true)  |  ![]( https://github.com/shmulik-willinger/behavioral_cloning/blob/master/readme_img/brightness_randomization.jpg?raw=true)|  ![]( https://github.com/shmulik-willinger/behavioral_cloning/blob/master/readme_img/grayscale.jpg?raw=true)
+
+Regarding the Distribution of the Steering lables, It is clear to see that Steering angle s=0 have the highest frequency, and that there are more positive angles than negative, meaning the dataset is not balance (the flipping step balancing this distribution)
+
+![]( https://github.com/shmulik-willinger/behavioral_cloning/blob/master/readme_img/steering_distribution.jpg?raw=true)
 
 ___________________
 
@@ -122,7 +128,7 @@ To combat the overfitting, I modified the model and added Dropout layers and mor
 
 **Using Generator**
 
-The images captured in the car simulator are very large comparing to dataset images for other common networks. Each image contains 76,800 pixels (80X320X3) after cropping, and when the dataset contains 70K images we need a huge memory for network training. I used Generator to pull pieces of the data and process it on the fly only when the model need it.  
+The images captured in the car simulator are very large comparing to dataset images for other common networks. Each image contains 76,800 pixels (80X320X3) after cropping, and when the dataset contains 70K images we need a huge memory for network training. I used Generator, enables to train the model by producing batches with data processing in real time only when the model need it.
 
 The disadvantage of using the generator is that errors are being hidden inside the thread, and if the inside code (generator function) is failing for any exception such as loading the images, cropping ect., the file output will be 'StopIteration' with no more information.
 
@@ -131,6 +137,8 @@ The disadvantage of using the generator is that errors are being hidden inside t
 When running the simulator to drive autonomously, it's running the model.prediction() function that gets the current image from the center camera. In order to get the right prediction it's necessary to process the image the same steps as we ran on the training set, including cropping and color changing. Missing this step will lead to strage predictions in the simulator.
 
 Machine learning involves trying out ideas and testing them to see if they work. If the model is over or underfitting, then try to figure out why and adjust accordingly. I tried a couple of ideas like reduced the bandwidth of the image by converting each image from BGR to YUV, adding brightness randomization by convering images to HSV, adding more layers (Fully connected, Polling, Conv2D and more) and checked the prediction changes in the simulator.
+
+There is a problem with combining lambda layers and save/load model
 
 ## Model Architecture
 

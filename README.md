@@ -22,14 +22,16 @@ The goals / steps of this project are the following:
 * Summarize the results with a written report
 
 
-## Details About Files & Code Quality
+## Details About the Files
 
 The project includes all required files and can be used to run the simulator in autonomous mode
 
 My project includes the following files:
-* behavioral_cloning.ipynb - the notebook with the data preprocessing and the model training
+* Behavioral_Cloning.ipynb - the notebook with the data preprocessing and the model training
+* model.py - the script used to create and train the model
 * drive.py - for driving the car in autonomous mode
-* model.h5 - containing a trained convolution neural network
+* model.zip - containing the trained convolution neural network (the unzip file inside is model.h5)
+* model.json - the architecture of the model as json
 * writeup.md - summarizing the project and results
 * video.mp4 - a video recording of the vehicle driving autonomously around the track
 
