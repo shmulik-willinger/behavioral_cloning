@@ -147,26 +147,28 @@ There is a problem with combining lambda layers and save/load model
 
 My model consisted of the following layers:
 
-<!---
-| Layer | Component        	|     Input	      	| Output |
-|:---------------------:|:---------------------------------------------:|
-| Convolution layer 1 | 2D Convolution layer with 'VALID' padding, filter of (5x5x1) and Stride=1 | (32,32,1) 	| (28,28,6)|
-|   	| ReLU Activation 	| (28,28,6) | (28,28,6)|
-| Convolution layer 2|	2D Convolution layer with 'SAME' padding, filter of (3x3x6) and Stride=1	|(28,28,6) | (28,28,6)|
-|    	| Max pooling	with 'VALID' padding, Stride=2 and ksize=2	| (28,28,6) | (14,14,6)|
-| Convolution layer 3   | 2D Convolution layer with 'VALID' padding, filter of (5x5x12) and Stride=1	| (14,14,6)| (10,10,16)|
-| 	|  ReLU Activation  		|(10,10,16)|(10,10,16)|
-| 	| Max pooling	with 'VALID' padding, Stride=2 and ksize=2	|(10,10,16)|(5,5,16)|
-| Fully connected	layer 1	| Reshape and Dropout|(5,5,16)| 400|
-| | Linear combination WX+b |400| 120|
-| | ReLU and Dropout |120| 120|
-| Fully connected	layer 2	| Linear combination WX+b|120| 84|
-| | ReLU and Dropout |84| 84|
-| Fully connected	Output layer	| Linear combination WX+b|84| 43 |
--->
-![]( https://github.com/shmulik-willinger/traffic_sign_classifier/blob/master/readme_img/model.jpg?raw=true)
 
-The netwotk consists of a convolution neural network staring with normalization layer, followed by 5 convolution layer with 5x5 filter sizes and depths between 24 and 48, along with 3 MaxPool layers followed by Dropout layers.
+| Layer | Component    	|     Output	 	| # Param |
+|:----------------:|:------------:|:------------:|:------------:|
+| Lambda | Normalization and mean zero | (None, 80, 320, 3) | 0 |
+| Convolution | kernel_size=(5, 5), padding='valid', activation='relu' | (None, 76, 316, 24) | 1824 |
+| Convolution |	kernel_size=(5, 5), padding='valid', activation='relu'	|(None, 72, 312, 36) | 21636 |
+| Dropout	| rate=0.5 | (None, 72, 312, 36) | 0 |
+| Convolution |kernel_size=(5, 5), padding='valid', activation='relu'	| (None, 68, 308, 48) | 43248 |
+| Max Pooling	| pool_size=(2, 2), padding='valid' |(None, 34, 154, 48)| 0 |
+| Dropout	| rate=0.5 |(None, 34, 154, 48) | 0 |
+| Convolution	| kernel_size=(3, 3), padding='valid', activation='relu' | (None, 32, 152, 64) | 27712|
+| Flatten | Flattens the input to one dimension |(None, 311296)| 0 |
+| Dense | Fully connected |(None, 100)| 31129700|
+| Dense | Fully connected |(None, 50)| 5050|
+| Dense | Fully connected |(None, 10)| 510|
+| Dense | Output layer  |(None, 1)| 1|
+
+
+<!---
+![]( https://github.com/shmulik-willinger/traffic_sign_classifier/blob/master/readme_img/model.jpg?raw=true)
+-->
+The netwotk consists of a convolution neural network staring with normalization layer, followed by 4 convolution layer with 5x5 and 3X3 filter sizes and depths between 24 and 48, along with MaxPool layers followed by Dropout layers.
 
 The model includes RELU layers to introduce nonlinearity, and the data is normalized in the model using a Keras lambda layer.
 

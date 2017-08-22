@@ -35,23 +35,23 @@ My project includes the following files:
 * writeup.md - summarizing the project and results
 * video.mp4 - a video recording of the vehicle driving autonomously around the track
 
-Submission includes functional code
-Using the Udacity provided simulator and my drive.py file:
-```sh
-[Download the simulator](https://classroom.udacity.com/nanodegrees/nd013/parts/fbf77062-5703-404e-b60c-95b78b2f3f9e/modules/6df7ae49-c61c-4bb2-a23e-6527e69209ec/lessons/46a70500-493e-4057-a78e-b3075933709d/concepts/1c9f7e68-3d2c-4313-9c8d-5a9ed42583dc)
-```
+The simulator can be downloaded [here](https://classroom.udacity.com/nanodegrees/nd013/parts/fbf77062-5703-404e-b60c-95b78b2f3f9e/modules/6df7ae49-c61c-4bb2-a23e-6527e69209ec/lessons/46a70500-493e-4057-a78e-b3075933709d/concepts/1c9f7e68-3d2c-4313-9c8d-5a9ed42583dc)
+
  The car can be driven autonomously around the track by executing
 ```sh
 python drive.py model.h5
 ```
 
-Submission code is usable and readable
-
 The behavioral_cloning.ipynb file contains the code for training and saving the convolution neural network. The notebook shows the pipeline I used for training and validating the model, and it contains comments to explain how the code works. The sections are divided according to:
 * Gathering the data
-* preprocessing the data by batchs
+* Preprocessing the data by batchs
 * Defining the Model
 * Training the Model
+
+## Output video
+
+The output video of the car completing the tracks can be dound here:
+
 
 ## Dependencies
 This project requires **Python 3.5** and the following Python libraries installed:
