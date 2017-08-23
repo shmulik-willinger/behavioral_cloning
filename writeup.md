@@ -1,13 +1,13 @@
 # **Behavioral Cloning**
 
-**Train a car to drive a simulator autonomously**
+**Train a car to drive autonomously in a simulator **
 
 
 ## The goals
 
 The goals / steps of this project are the following:
 * Use the simulator to collect data of good driving behavior
-* Build, a convolution neural network in Keras that predicts steering angles from images
+* Build a convolution neural network in Keras that predicts steering angles from images
 * Train and validate the model with a training and validation set
 * Test that the model successfully drives around track one without leaving the road
 * Summarize the results with a written report
@@ -18,7 +18,7 @@ The goals / steps of this project are the following:
 ---
 ## Collecting the Training Set
 
-To capture good driving behavior, I first recorded a couple of laps on track one using center lane driving. Each recording epoch consist of 3 images represent 3 cameras on the vehicle. Having 3 images for each epoch halpping collecting more data, and will help teach the network how to steer back to the center and correct wrong behaviors.
+To capture good driving behavior, I first recorded a couple of laps on track one using center lane driving. Each recording epoch consist of 3 images represent 3 cameras on the vehicle. Having 3 images for each epoch help collecting more data, and teach the network how to steer back to the center and correct wrong behaviors.
 
 Here is an example of how center lane driving looks from all the three cameras:
 
@@ -28,13 +28,13 @@ Left camera              |  Center camera | Right camera
 
 In order to use the left and right images I needed to add a correction factor for the center-steering measurment, in order to  create adjusted steering measurements for the side camera images
 
-Some of the interesting challenges on the tracks including driving in the sharp curves, different texture and different borders of the road, and the second Track is also different from the first one. In order to train the car to drive on all of them I repeated the collection process on all the tracks and laps. Driving in the simulator is pretty difficult in some curves.
+Some of the interesting challenges on the tracks includes driving in the sharp curves, different texture and different borders of the road, and the second Track is also different from the first one. In order to train the car to drive on all of them I repeated the collection process on all the tracks and laps. Driving in the simulator is pretty difficult in some curves.
 
-I collected data of center lane driving from 5 laps, and some extra data for 'recovery driving from the sides', with special data recording driving smoothly  around 10 sharp curves.
+I collected data of center lane driving from 5 laps, and some extra data for 'recovery driving from the sides', along with special data recording driving smoothly around 10 sharp curves.
 
-After the collection process, I had X number of data points images to start with.
+After the collection process, I had 74760 data points images to start with.
 
-Each image is actually 160 pixels high and 320 pixels wide, with 3 channels -RGB.
+Each image dimensions is 160 X 320 pixels with 3 channels -RGB.
 
 I stoped collecting data after observing the overfitting when training the model.
 
@@ -42,10 +42,10 @@ ___________________
 
 ## Pre-process the Data Set
 
-Data augmentation has a couple of benefits, including adding more data for training the that the data is more comperhensive.
+Data augmentation has a couple of benefits, including adding more comprehensive data for training.
 I needed lots of data in order to well train the model. After collecting all the data from the two tracks, driving back and forth, and using all the 3 cameras images, I also performed the following steps:
 
-The top portion of the image capture sky, trees ans other elements which are unnecessary for the training process and might distract the model, the same for the buttom portion of the image. So I decided to remove pixels contain redundant information. I cropped The images to remove this pixels. Each image reduced volume by 50%, and I gained a more accurate model, along with savings space, memory and model runtime.
+The top portion of the image capture sky, trees and other elements which are unnecessary for the training process and might distract the model, the same for the lower portion of the image. So I decided to remove pixels containing redundant information. I cropped The images to remove this pixels. Each image reduced capacity by 50%, and I gained a more accurate model, along with savings space, memory and model runtime.
 Here is an example of the cropping process on an image:
 
 original image      |  Cropping process | Cropped image
@@ -56,19 +56,21 @@ Since each recording epoch has 3 images represent 3 cameras on the vehicle, I us
 
  ![]( https://github.com/shmulik-willinger/behavioral_cloning/blob/master/readme_img/correction-angle.png?raw=true)
 
-To help the model generalize better and to improve the accuracy on the opposite curves, I flipped the images and angles to simulate driving counter-clockwise, thinking that this would save me to collect more reliable information and will double the dataset. There are couple of ways to horizontally flip an image, I used cv2.flip() after reading that it usually faster that using ather methods like np.fliplr().  Here is an image that has been flipped:
+To help the model generalize better and to improve the accuracy on the opposite curves, I flipped the images and angles to simulate driving counter-clockwise, thinking that this would save me from collecting more reliable information and will double the dataset. There are couple of ways to horizontally flip an image, I used cv2.flip() after observing that it is much faster than using other methods like np.fliplr().
+
+Here is an example of image that has been flipped in that process:
 
 original image      |  flipped image
 :---------------------:|:---------------------:
 ![]( https://github.com/shmulik-willinger/behavioral_cloning/blob/master/readme_img/before_flip.jpg?raw=true)  |  ![]( https://github.com/shmulik-willinger/behavioral_cloning/blob/master/readme_img/after_flip.jpg?raw=true)
 
-During the training I experienced some other image processing techniques like reduced the bandwidth of the image by converting each image from BGR to YUV, adding brightness randomization by convering images to HSV and more. After I realized that these changes were not conducive to better prediction outcomes - I removed them from the final preprocessing step. Here is an example of image Transformation I tried:
+During the training I have tried some other image processing techniques like reduced the bandwidth of the images by converting each image from BGR to YUV, adding brightness randomization by convering images to HSV and more. After I realized that these changes were not conducive to better prediction outcomes - I removed them from the final preprocessing step. Here is an example of some image transformation I tried:
 
 reduce bandwith      |  brightness randomization | grayscale
 :---------------------:|:---------------------:|:---------------------:
 ![]( https://github.com/shmulik-willinger/behavioral_cloning/blob/master/readme_img/reduce_bandwith.jpg?raw=true)  |  ![]( https://github.com/shmulik-willinger/behavioral_cloning/blob/master/readme_img/brightness_randomization.jpg?raw=true)|  ![]( https://github.com/shmulik-willinger/behavioral_cloning/blob/master/readme_img/grayscale.jpg?raw=true)
 
-Regarding the Distribution of the Steering lables, It is clear to see that Steering angle s=0 have the highest frequency, and that there are more positive angles than negative, meaning the dataset is not balance (the flipping step balancing this distribution)
+Regarding the distribution of the steering lables, It is clear to see that steering angle s=0 have the highest frequency, and that there are more positive angles than negative, meaning the dataset is not balance (By horizontally reversing the images we gain distribution balancing)
 
 ![]( https://github.com/shmulik-willinger/behavioral_cloning/blob/master/readme_img/steering_distribution.jpg?raw=true)
 
@@ -82,11 +84,9 @@ I used the images as the feature set, and the steering measurments as the lables
 
 The overall strategy for deriving a model architecture was to start with a known self-driving car model.
 
-My first step was to use a convolution neural network model similar to the nVidia architecture. I thought this model might be appropriate because it was built and designed as a self-driving car model. The original model architecture:
- ![]( https://github.com/shmulik-willinger/behavioral_cloning/blob/master/readme_img/nvidia.jpg?raw=true)
-'''
-https://devblogs.nvidia.com/parallelforall/deep-learning-self-driving-cars/
-'''
+My first step was to use a convolution neural network model similar to the [nVidia architecture](https://github.com/shmulik-willinger/behavioral_cloning/blob/master/readme_img/nvidia.jpg). I thought this model might be appropriate because it was built and designed as a self-driving car model. The original model architecture looks as Follow:
+ ![]( https://github.com/shmulik-willinger/behavioral_cloning/blob/master/readme_img/nvidia.png?raw=true)
+
 Ideally, the model will make good predictions on both the training and validation sets. The implication is that when the network sees an image, it can successfully predict what angle was being driven at that moment.
 
 **Approach taken for finding the solution**
@@ -108,7 +108,7 @@ Here we can see the training and validation 'mean squared error loss' during the
 ![]( https://github.com/shmulik-willinger/behavioral_cloning/blob/master/readme_img/mse_loss.png?raw=true)
 
 
-** Parameters tuning **
+**Parameters tuning**
 
 To add the left and right images for each epoch I needed to configure the 'correction factor' parameter to set their steering value. I started with the default 0.2 and made some  experimentation to changes it till I noticed an improvment in the driving simulator.
 
@@ -118,7 +118,7 @@ Keras is using 10 epochs as default. After observing that the validation loss de
 
 
 
-** Reduce overfitting in the model **
+**Reduce overfitting in the model**
 
 The validation set was took as 20% of the dataset and helped determine if the model was over or under fitting.
 
@@ -138,7 +138,11 @@ When running the simulator to drive autonomously, it's running the model.predict
 
 Machine learning involves trying out ideas and testing them to see if they work. If the model is over or underfitting, then try to figure out why and adjust accordingly. I tried a couple of ideas like reduced the bandwidth of the image by converting each image from BGR to YUV, adding brightness randomization by convering images to HSV, adding more layers (Fully connected, Polling, Conv2D and more) and checked the prediction changes in the simulator.
 
-There is a problem with combining lambda layers and save/load model
+There is a problem with combining lambda layers and save/load model.
+
+I had a couple of issues with the version of Keras and Tensorflow. Since the training was performed on an Amazon g2.2xlarge GPU server, and the simulator driving was running on my local PC. In order for the model.h5 file to run correctlly the TensorFlow and Keras must be exectly in the same version.
+
+OpenCV read images as BGR, and the file drive.py (to run the car in the simulator) uses RGB. In order for the images comming from the simulator in the autonomous mode to be process correctlly - I used cv2.COLOR_BGR2RGB on them.
 
 ## Model Architecture
 
@@ -151,37 +155,39 @@ My model consisted of the following layers:
 | Layer | Component    	|     Output	 	| # Param |
 |:----------------:|:------------:|:------------:|:------------:|
 | Lambda | Normalization and mean zero | (None, 80, 320, 3) | 0 |
-| Convolution | kernel_size=(5, 5), padding='valid', activation='relu' | (None, 76, 316, 24) | 1824 |
-| Convolution |	kernel_size=(5, 5), padding='valid', activation='relu'	|(None, 72, 312, 36) | 21636 |
-| Dropout	| rate=0.5 | (None, 72, 312, 36) | 0 |
-| Convolution |kernel_size=(5, 5), padding='valid', activation='relu'	| (None, 68, 308, 48) | 43248 |
-| Max Pooling	| pool_size=(2, 2), padding='valid' |(None, 34, 154, 48)| 0 |
-| Dropout	| rate=0.5 |(None, 34, 154, 48) | 0 |
-| Convolution	| kernel_size=(3, 3), padding='valid', activation='relu' | (None, 32, 152, 64) | 27712|
-| Flatten | Flattens the input to one dimension |(None, 311296)| 0 |
-| Dense | Fully connected |(None, 100)| 31129700|
+| Convolution | kernel_size=(5, 5), strides=(2, 2), padding='valid', activation='relu' | (None, 38, 158, 24) | 1824 |
+| Dropout	| rate=0.5 | (None, 38, 158, 24) | 0 |
+| Convolution |	kernel_size=(5, 5), strides=(2, 2), padding='valid', activation='relu'	|(None, 17, 77, 36) | 21636 |
+| Dropout	| rate=0.5 | (None, 17, 77, 36) | 0 |
+| Convolution |kernel_size=(5, 5), strides=(2, 2), padding='valid', activation='relu'	| (None, 7, 37, 48) | 43248 |
+| Dropout	| rate=0.5 | (None, 7, 37, 48) | 0 |
+| Convolution	| kernel_size=(3, 3), strides=(1, 1), padding='valid', activation='relu' | (None, 5, 35, 64) | 27712|
+| Dropout	| rate=0.5 | (None, 5, 35, 64) | 0 |
+| Convolution	| kernel_size=(3, 3), strides=(1, 1), padding='valid', activation='relu' | (None, 3, 33, 64) | 36928 |
+| Dropout	| rate=0.5 | (None, 3, 33, 64) | 0 |
+| Flatten | Flattens the input to one dimension |(None, 6336)| 0 |
+| Dense | Fully connected |(None, 100)| 633700|
 | Dense | Fully connected |(None, 50)| 5050|
 | Dense | Fully connected |(None, 10)| 510|
 | Dense | Output layer  |(None, 1)| 1|
 
-
-<!---
-![]( https://github.com/shmulik-willinger/traffic_sign_classifier/blob/master/readme_img/model.jpg?raw=true)
--->
-The netwotk consists of a convolution neural network staring with normalization layer, followed by 4 convolution layer with 5x5 and 3X3 filter sizes and depths between 24 and 48, along with MaxPool layers followed by Dropout layers.
+The netwotk consists of a convolution neural network staring with normalization layer, followed by 3 convolution layers with kernel of 5x5 and 2 convolution layer with kernel of 3X3. filter sizes and depths between 24 and 64, followed by Dropout layers between them.
 
 The model includes RELU layers to introduce nonlinearity, and the data is normalized in the model using a Keras lambda layer.
 
 At the end of the model I have 4 Fully connected layers and a single output node that will predict the steering angle (regression network)
 
 
-Here is a visualization of the architecture:
-
-
 ## Results and conclusions
 
-I was satisfied that the model is making good predictions on the training and validation sets, and at the end of the process, the vehicle is able to drive autonomously around Track-1 and Track-2  without leaving the road.
+I was satisfied that the model is making good predictions on the training and validation sets, and at the end of the process, the vehicle is able to drive autonomously around Track-1 and partially on Track-2 without leaving the road.
 
 I used the file video.py to record the video of the car while driving autonomously in the simulator, and the video files can be found here as well.
 
-Behavior Cloning is fun
+The output video of the car completing the tracks can also be found here:
+
+Track 1  |  Track 2 (partially)
+:-------------------------:|:-------------------------:
+[![video track_1](https://github.com/shmulik-willinger/behavioral_cloning/blob/master/readme_img/behavioral_cloning_simulator_track_1.gif)](http://www.youtube.com/watch?v=fIvBNRCIY4U)  |  [![video track_2](https://github.com/shmulik-willinger/behavioral_cloning/blob/master/readme_img/behavioral_cloning_simulator_track_2.gif)](http://www.youtube.com/watch?v=A1280XlpITA)
+
+Behavior Cloning is fun :+1:

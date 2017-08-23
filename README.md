@@ -50,7 +50,11 @@ The behavioral_cloning.ipynb file contains the code for training and saving the 
 
 ## Output video
 
-The output video of the car completing the tracks can be dound here:
+The output video of the car completing the tracks can be found here:
+
+Track 1  |  Track 2 (partially)
+:-------------------------:|:-------------------------:
+[![video track_1](https://github.com/shmulik-willinger/behavioral_cloning/blob/master/readme_img/behavioral_cloning_simulator_track_1.gif)](http://www.youtube.com/watch?v=fIvBNRCIY4U)  |  [![video track_2](https://github.com/shmulik-willinger/behavioral_cloning/blob/master/readme_img/behavioral_cloning_simulator_track_2.gif)](http://www.youtube.com/watch?v=A1280XlpITA)
 
 
 ## Dependencies
