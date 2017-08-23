@@ -1,6 +1,6 @@
 # **Behavioral Cloning**
 
-**Train a car to drive autonomously in a simulator **
+**Train a car to drive autonomously in a simulator**
 
 
 ## The goals
@@ -46,6 +46,7 @@ Data augmentation has a couple of benefits, including adding more comprehensive 
 I needed lots of data in order to well train the model. After collecting all the data from the two tracks, driving back and forth, and using all the 3 cameras images, I also performed the following steps:
 
 The top portion of the image capture sky, trees and other elements which are unnecessary for the training process and might distract the model, the same for the lower portion of the image. So I decided to remove pixels containing redundant information. I cropped The images to remove this pixels. Each image reduced capacity by 50%, and I gained a more accurate model, along with savings space, memory and model runtime.
+
 Here is an example of the cropping process on an image:
 
 original image      |  Cropping process | Cropped image
@@ -64,7 +65,9 @@ original image      |  flipped image
 :---------------------:|:---------------------:
 ![]( https://github.com/shmulik-willinger/behavioral_cloning/blob/master/readme_img/before_flip.jpg?raw=true)  |  ![]( https://github.com/shmulik-willinger/behavioral_cloning/blob/master/readme_img/after_flip.jpg?raw=true)
 
-During the training I have tried some other image processing techniques like reduced the bandwidth of the images by converting each image from BGR to YUV, adding brightness randomization by convering images to HSV and more. After I realized that these changes were not conducive to better prediction outcomes - I removed them from the final preprocessing step. Here is an example of some image transformation I tried:
+During the training I have tried some other image processing techniques like reduced the bandwidth of the images by converting each image from BGR to YUV, adding brightness randomization by convering images to HSV and more. After I realized that these changes were not conducive to better prediction outcomes - I removed them from the final preprocessing step.
+
+Here is an example of some image transformation I tried:
 
 reduce bandwith      |  brightness randomization | grayscale
 :---------------------:|:---------------------:|:---------------------:
@@ -80,22 +83,21 @@ ___________________
 
 **Training Strategy**
 
-I used the images as the feature set, and the steering measurments as the lables set for training the model.
+I used the images as the feature set, and the steering measurments as the labels set for training the model.
 
-The overall strategy for deriving a model architecture was to start with a known self-driving car model.
+The overall strategy was to start with a known self-driving car model, so I used a convolution neural network model similar to the [nVidia architecture](https://github.com/shmulik-willinger/behavioral_cloning/blob/master/readme_img/nvidia.jpg). I thought this model might be appropriate because it was built and designed as a self-driving car model. The original model architecture looks as Follow:
 
-My first step was to use a convolution neural network model similar to the [nVidia architecture](https://github.com/shmulik-willinger/behavioral_cloning/blob/master/readme_img/nvidia.jpg). I thought this model might be appropriate because it was built and designed as a self-driving car model. The original model architecture looks as Follow:
  ![]( https://github.com/shmulik-willinger/behavioral_cloning/blob/master/readme_img/nvidia.png?raw=true)
 
 Ideally, the model will make good predictions on both the training and validation sets. The implication is that when the network sees an image, it can successfully predict what angle was being driven at that moment.
 
 **Approach taken for finding the solution**
 
-Because this model is a regression network (and not classification) and I what it to minimize the error between the steering measurment that the network predict and the truth steering, so I used 'mean suared error' for the loss function (instead the cross-antropy) since it's a good function for it.
+Because this model is a regression network (and not classification) I what it to minimize the error between the steering measurment that the network predict and the truth steering, so I used 'mean squared error' for the loss function (and not the cross-antropy) since it's a good function for it.
 
 I randomly shuffled the data and split off 20% for a validation set.
 
-After training the model I run the simulator to see how well the car was driving around track one. In the first Attempts the car was swerving from side to side and couldn't drive correctlly, and there were a few spots (esspecialy on sharp curves) where the vehicle fell off the track or even to the lack. To improve the driving behavior in these cases, I took more capture images as a datasets only in the curves. Then I continued tuning parameters and layers values in the model, and run the simulator on the train results to compare the changes.
+After training the model I ran the simulator to see how well the car was driving around track one. In the first attempts the car was swerving from side to side and couldn't drive correctlly, and there were a few spots (esspecialy on sharp curves) where the vehicle fell off the track. To improve the driving behavior in these cases, I took more capture images as a datasets only in the curves. Then I continued tuning parameters and layers values in the model, and ran the simulator on the train results to compare the changes.
 
 I noticed that the training loss and validation loss are both high, so I perform the following:
 * In order to normalize the data I added a layer in the model to divide each pixel by 255 (max value) which will get the value range between 0 to 1.
@@ -110,7 +112,7 @@ Here we can see the training and validation 'mean squared error loss' during the
 
 **Parameters tuning**
 
-To add the left and right images for each epoch I needed to configure the 'correction factor' parameter to set their steering value. I started with the default 0.2 and made some  experimentation to changes it till I noticed an improvment in the driving simulator.
+To add the left and right images for each epoch I needed to configure the 'correction factor' parameter to set their steering value. I started with the default 0.2 and made some experiments to changes it till I noticed an improvment in the driving simulator.
 
 The model used an adam optimizer, so the learning rate was not tuned manually.
 
@@ -120,29 +122,27 @@ Keras is using 10 epochs as default. After observing that the validation loss de
 
 **Reduce overfitting in the model**
 
-The validation set was took as 20% of the dataset and helped determine if the model was over or under fitting.
+In order to gauge how well the model was working, I split my images and steering angle data into a training and validation set. The validation set took 20% of the dataset and helped determine if the model was over or under fitting.
 
-In order to gauge how well the model was working, I split my image and steering angle data into a training and validation set. I found that my first model had a low mean squared error on the training set but a high mean squared error on the validation set. This implied that the model was overfitting.
+I found that my first model had a low mean squared error on the training set but a high mean squared error on the validation set. This implied that the model was overfitting.
 
-To combat the overfitting, I modified the model and added Dropout layers and more dataset. The model was also trained and validated on different data sets to ensure that the model was not overfitting.
+To deal with the overfitting, I modified the model and added Dropout layers and more dataset. (see architecture section below)
 
 **Using Generator**
 
-The images captured in the car simulator are very large comparing to dataset images for other common networks. Each image contains 76,800 pixels (80X320X3) after cropping, and when the dataset contains 70K images we need a huge memory for network training. I used Generator, enables to train the model by producing batches with data processing in real time only when the model need it.
+The images captured in the car simulator are very large comparing to dataset images for other common networks. Each image contains 76,800 pixels (80X320X3) after cropping, and when the dataset contains 70K images we need a huge memory for network training. I used Generator, enables to train the model by producing batches with data processing in real time, only when the model need it.
 
-The disadvantage of using the generator is that errors are being hidden inside the thread, and if the inside code (generator function) is failing for any exception such as loading the images, cropping ect., the file output will be 'StopIteration' with no more information.
+The disadvantage of using the generator is that errors are being hidden inside the thread, and if the inside code (generator function) is failing for any exception such as loading the images, cropping etc., the file output will be 'StopIteration' with no more information.
 
 **Remarks**
 
-When running the simulator to drive autonomously, it's running the model.prediction() function that gets the current image from the center camera. In order to get the right prediction it's necessary to process the image the same steps as we ran on the training set, including cropping and color changing. Missing this step will lead to strage predictions in the simulator.
+When running the simulator to drive autonomously, it's running the model.prediction() function that gets the current image from the center camera. In order to get the right prediction it's necessary to process the image the same steps as we ran on the training set, including cropping and color changing. Missing this step will lead to strange predictions in the simulator.
 
-Machine learning involves trying out ideas and testing them to see if they work. If the model is over or underfitting, then try to figure out why and adjust accordingly. I tried a couple of ideas like reduced the bandwidth of the image by converting each image from BGR to YUV, adding brightness randomization by convering images to HSV, adding more layers (Fully connected, Polling, Conv2D and more) and checked the prediction changes in the simulator.
+Machine learning involves trying out ideas and testing them to see if they work. If the model is over or underfitting, then try to figure out why and adjust accordingly. I tried a couple of ideas like reduced the bandwidth of the image by converting each image from BGR to YUV, adding brightness randomization by convering images to HSV, adding more layers (Fully connected, Polling, Conv2D and more) and checking each time how if affects the prediction in the simulator.
 
-There is a problem with combining lambda layers and save/load model.
+I had a couple of issues with the version of Keras and Tensorflow. Since the training was performed on an Amazon g2.2xlarge GPU server, and the simulator driving was running on my local PC. In order for the model.h5 file to run correctly the TensorFlow and Keras must be exectly in the same version (latest).
 
-I had a couple of issues with the version of Keras and Tensorflow. Since the training was performed on an Amazon g2.2xlarge GPU server, and the simulator driving was running on my local PC. In order for the model.h5 file to run correctlly the TensorFlow and Keras must be exectly in the same version.
-
-OpenCV read images as BGR, and the file drive.py (to run the car in the simulator) uses RGB. In order for the images comming from the simulator in the autonomous mode to be process correctlly - I used cv2.COLOR_BGR2RGB on them.
+OpenCV read images as BGR, and the file drive.py (to run the car in the simulator) uses RGB. In order for the images comming from the simulator in the autonomous mode to be process correctly - I used cv2.COLOR_BGR2RGB on them.
 
 ## Model Architecture
 
@@ -171,9 +171,9 @@ My model consisted of the following layers:
 | Dense | Fully connected |(None, 10)| 510|
 | Dense | Output layer  |(None, 1)| 1|
 
-The netwotk consists of a convolution neural network staring with normalization layer, followed by 3 convolution layers with kernel of 5x5 and 2 convolution layer with kernel of 3X3. filter sizes and depths between 24 and 64, followed by Dropout layers between them.
+The network consists of a convolution neural network starting with normalization layer, followed by 3 convolution layers with kernel of 5x5 and 2 convolution layer with kernel of 3X3. filter sizes and depths between 24 and 64, with by Dropout layers between them.
 
-The model includes RELU layers to introduce nonlinearity, and the data is normalized in the model using a Keras lambda layer.
+The model uses RELU activation on the layers to introduce nonlinearity, and the data is normalized in the model using a Keras lambda layer.
 
 At the end of the model I have 4 Fully connected layers and a single output node that will predict the steering angle (regression network)
 
@@ -182,7 +182,7 @@ At the end of the model I have 4 Fully connected layers and a single output node
 
 I was satisfied that the model is making good predictions on the training and validation sets, and at the end of the process, the vehicle is able to drive autonomously around Track-1 and partially on Track-2 without leaving the road.
 
-I used the file video.py to record the video of the car while driving autonomously in the simulator, and the video files can be found here as well.
+I used the file video.py to record the video of the car while driving autonomously in the simulator (Consists of the images processed from the simulator on runtime).
 
 The output video of the car completing the tracks can also be found here:
 

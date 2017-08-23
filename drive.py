@@ -57,6 +57,10 @@ def telemetry(sid, data):
         # The current speed of the car
         speed = data["speed"]
         # The current image from the center camera of the car
+
+        #In order to get the right prediction it's necessary to process the image the same steps as we ran on
+        # the training set, including cropping and color changing. Missing this step will
+        # lead to strange predictions in the simulator.
         imgString = data["image"]
         image = Image.open(BytesIO(base64.b64decode(imgString)))
         image_array = np.asarray(image)

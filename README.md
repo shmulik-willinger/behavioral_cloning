@@ -6,12 +6,12 @@ Overview
 ---
 The goal of this project is to effectively train a car to drive autonomously in a simulator. The simulator provided by Udacity and has two different tracks the car can drive in.
 
-In order to train the model, the project is using deep neural networks and convolutional neural networks to clone driving behavior. The model Using Keras framework and output a steering angle to the autonomous vehicle.
+In order to train the model, the project is using deep neural networks and convolutional neural networks to clone driving behavior. The model Using Keras framework over Tensorflow and output a steering angle to the autonomous vehicle.
 
 A detailed description of the project including the model, data and visualizing is also provided  [here](https://github.com/udacity/CarND-Behavioral-Cloning-P3/blob/master/writeup_template.md)
 
 
-![]( https://github.com/shmulik-willinger/behavioral_cloning/blob/master/readme_img/sim-image.png?raw=true)
+![]( https://github.com/shmulik-willinger/behavioral_cloning/blob/master/readme_img/sim-image.jpg?raw=true)
 
 The Goals
 ---
@@ -30,7 +30,7 @@ My project includes the following files:
 * Behavioral_Cloning.ipynb - the notebook with the data preprocessing and the model training
 * model.py - the script used to create and train the model
 * drive.py - for driving the car in autonomous mode
-* model.zip - containing the trained convolution neural network (the unzip file inside is model.h5)
+* model.h5 - containing the trained convolution neural network
 * model.json - the architecture of the model as json
 * writeup.md - summarizing the project and results
 * video.mp4 - a video recording of the vehicle driving autonomously around the track
@@ -42,7 +42,7 @@ The simulator can be downloaded [here](https://classroom.udacity.com/nanodegrees
 python drive.py model.h5
 ```
 
-The behavioral_cloning.ipynb file contains the code for training and saving the convolution neural network. The notebook shows the pipeline I used for training and validating the model, and it contains comments to explain how the code works. The sections are divided according to:
+The Behavioral_Cloning.ipynb file contains the code for training and saving the convolution neural network. The notebook shows the pipeline I used for training and validating the model, and it contains comments to explain how the code works. The sections are divided according to:
 * Gathering the data
 * Preprocessing the data by batchs
 * Defining the Model
@@ -66,4 +66,5 @@ This project requires **Python 3.5** and the following Python libraries installe
 - [OpenCV](https://pypi.python.org/pypi/opencv-python#)
 - [Sklearn](scikit-learn.org/)
 - [Pandas](pandas.pydata.org/)
-- [TensorFlow](http://tensorflow.org)
+- [TensorFlow](http://tensorflow.org) version 1.2.1
+- [Keras](https://keras.io/) version 2.0.6

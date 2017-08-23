@@ -111,26 +111,28 @@ dropout = 0.5
 model = Sequential()
 #normalization and mean zero - centered around zero with small standard deviation 
 model.add(Lambda(lambda x: x/127.5 -1.0, input_shape=(80,320,3))) 
-model.add(Conv2D(24, kernel_size=(5, 5), padding='valid', activation='relu'))
-model.add(Conv2D(36, kernel_size=(5, 5), padding='valid', activation='relu'))
+model.add(Conv2D(24, kernel_size=(5, 5), strides=(2, 2), padding='valid', activation='relu'))
 model.add(Dropout(dropout))
-model.add(Conv2D(48, kernel_size=(5, 5), padding='valid', activation='relu'))
-model.add(MaxPooling2D())
+model.add(Conv2D(36, kernel_size=(5, 5), strides=(2, 2), padding='valid', activation='relu'))
 model.add(Dropout(dropout))
-model.add(Conv2D(64, kernel_size=(3, 3), padding='valid', activation='relu'))
+model.add(Conv2D(48, kernel_size=(5, 5), strides=(2, 2), padding='valid', activation='relu'))
+model.add(Dropout(dropout))
+model.add(Conv2D(64, kernel_size=(3, 3), strides=(1, 1), padding='valid', activation='relu'))
+model.add(Dropout(dropout))
+model.add(Conv2D(64, kernel_size=(3, 3), strides=(1, 1), padding='valid', activation='relu'))
+model.add(Dropout(dropout))
 model.add(Flatten())
 model.add(Dense(100))
 model.add(Dense(50))
 model.add(Dense(10))
 model.add(Dense(1))
 
-
 from time import time
 start_time = time()
 
 model.compile(loss='mse', optimizer='adam')
-history_object = model.fit_generator(train_generator, steps_per_epoch= len(train_samples)/64, 
-    validation_data=validation_generator, validation_steps=len(validation_samples), epochs=2, verbose = 1)
+history_object = model.fit_generator(train_generator, steps_per_epoch= len(train_samples),
+    validation_data=validation_generator, validation_steps=len(validation_samples), epochs=3, verbose = 1)
 
 # save the model to use it in the simulator
 model.save('model.h5')
