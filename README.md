@@ -35,7 +35,7 @@ My project includes the following files:
 * writeup.md - summarizing the project and results
 * video.mp4 - a video recording of the vehicle driving autonomously around the track
 
-The simulator can be downloaded [here](https://classroom.udacity.com/nanodegrees/nd013/parts/fbf77062-5703-404e-b60c-95b78b2f3f9e/modules/6df7ae49-c61c-4bb2-a23e-6527e69209ec/lessons/46a70500-493e-4057-a78e-b3075933709d/concepts/1c9f7e68-3d2c-4313-9c8d-5a9ed42583dc)
+The simulator can be downloaded from [here](https://d17h27t6h515a5.cloudfront.net/topher/2017/February/58ae4419_windows-sim/windows-sim.zip)
 
  The car can be driven autonomously around the track by executing
 ```sh
