@@ -8,7 +8,7 @@ The goal of this project is to effectively train a car to drive autonomously in 
 
 In order to train the model, the project is using deep neural networks and convolutional neural networks to clone driving behavior. The model Using Keras framework over Tensorflow and output a steering angle to the autonomous vehicle.
 
-A detailed description of the project including the model, data and visualizing is also provided  [here](https://github.com/udacity/CarND-Behavioral-Cloning-P3/blob/master/writeup_template.md)
+A detailed description of the project including the model, data and visualizing is also provided  [here](https://github.com/shmulik-willinger/behavioral_cloning/blob/master/writeup_template.md)
 
 
 ![]( https://github.com/shmulik-willinger/behavioral_cloning/blob/master/readme_img/sim-image.jpg?raw=true)
